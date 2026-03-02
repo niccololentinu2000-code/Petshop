@@ -1,0 +1,243 @@
+{
+  "name": "DT_Get_Store_Data_v3",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "petshop-data",
+        "responseMode": "responseNode",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Access-Control-Allow-Methods",
+                "value": "GET, OPTIONS"
+              }
+            ]
+          }
+        }
+      },
+      "id": "webhook_node",
+      "name": "Webhook",
+      "position": [
+        272,
+        304
+      ],
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "webhookId": "0d590cad-6565-411a-9e69-f8d1fcdadf1f",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "animals"
+      },
+      "id": "animals_node",
+      "name": "GetAnimals",
+      "position": [
+        480,
+        208
+      ],
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "credentials": {
+        "supabaseApi": {
+          "id": "YufGuC8BpxsAUy7B",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "inventory"
+      },
+      "id": "inventory_node",
+      "name": "GetInventory",
+      "position": [
+        480,
+        352
+      ],
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "credentials": {
+        "supabaseApi": {
+          "id": "YufGuC8BpxsAUy7B",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "cleaning_tasks"
+      },
+      "id": "cleaning_node",
+      "name": "GetCleaning",
+      "position": [
+        480,
+        480
+      ],
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "credentials": {
+        "supabaseApi": {
+          "id": "YufGuC8BpxsAUy7B",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "id": "merge_node",
+      "name": "MergeAll",
+      "position": [
+        720,
+        352
+      ],
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\n// Items come as flat merged array from all 3 Supabase nodes\n// We separate them by which table they came from using a field that's unique\nconst animals = [];\nconst inventory = [];\nconst cleaning = [];\n\nfor (const item of items) {\n  const d = item.json;\n  if (d.health_score !== undefined) animals.push(d);\n  else if (d.item_name !== undefined) inventory.push(d);\n  else cleaning.push(d);\n}\n\nreturn [{ json: { animals, inventory, cleaning } }];"
+      },
+      "id": "code_node",
+      "name": "BuildResponse",
+      "position": [
+        944,
+        352
+      ],
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Access-Control-Allow-Methods",
+                "value": "GET, POST, OPTIONS"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type"
+              }
+            ]
+          }
+        }
+      },
+      "id": "respond_node",
+      "name": "RespondToWebhook",
+      "position": [
+        1168,
+        352
+      ],
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "BuildResponse": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "RespondToWebhook",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "GetAnimals": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "MergeAll",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "GetCleaning": {
+      "main": [
+        [
+          {
+            "index": 2,
+            "node": "MergeAll",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "GetInventory": {
+      "main": [
+        [
+          {
+            "index": 1,
+            "node": "MergeAll",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "MergeAll": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "BuildResponse",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "GetAnimals",
+            "type": "main"
+          },
+          {
+            "index": 0,
+            "node": "GetInventory",
+            "type": "main"
+          },
+          {
+            "index": 0,
+            "node": "GetCleaning",
+            "type": "main"
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "753b33ce-5e62-4eae-8273-0bd5ac70a52b",
+  "meta": {
+    "instanceId": "329cf94cd38a0172a626490345cbe02d094e362f3f0d9133e2b4eaf6f125a0b5"
+  },
+  "id": "ILOqJlEIQvxZgzr3",
+  "tags": []
+}

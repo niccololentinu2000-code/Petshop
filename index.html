@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PetShop Digital Twin | Premium Console</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Outfit:wght@400;600;800&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <div class="brand">
+                <h1>PetShop Console</h1>
+                <p>Digital Twin Monitoring System • v4.0 (Modular)</p>
+            </div>
+            <div class="status-pill">
+                <div id="status-dot" class="status-dot"></div>
+                <span id="conn-text">CONNESSO</span>
+            </div>
+        </header>
+
+        <main class="dashboard-grid">
+            <!-- Animals Section -->
+            <section class="card">
+                <h2 class="section-title">
+                    <span>🐾</span> Monitoraggio Animali
+                </h2>
+                <div id="animal-grid" class="animal-grid">
+                    <p style="color: var(--text-dim)">Inizializzazione sistema...</p>
+                </div>
+            </section>
+
+            <!-- Sidebar -->
+            <aside>
+                <div class="card" style="height: 100%;">
+                    <h2 class="section-title">
+                        <span>📦</span> Magazzino
+                    </h2>
+                    <div id="inventory-list" class="inventory-list">
+                        <p style="color: var(--text-dim)">Caricamento scorte...</p>
+                    </div>
+                </div>
+            </aside>
+        </main>
+    </div>
+
+    <div id="toast-container"></div>
+    <script type="module" src="/src/main.js"></script>
+</body>
+
+</html>
